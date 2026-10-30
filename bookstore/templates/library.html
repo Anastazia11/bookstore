@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cover %}
+{% block title %}My library · Bookstore{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>My library</h1>
+  <p class="muted">Books you bought or rented. Download them any time while you still have access.</p>
+</div>
+
+{% if lines %}
+<div class="cart-list">
+  {% for it in lines %}
+  <div class="cart-row {{ '' if it.active else 'is-expired' }}">
+    <div class="cart-cover">{{ cover({'id': it.book_id, 'title': it.title, 'image_url': it.image_url}) }}</div>
+    <div class="cart-info">
+      {% if it.book_id %}
+        <a class="cart-title" href="{{ url_for('book_detail', book_id=it.book_id) }}">{{ it.title }}</a>
+      {% else %}
+        <span class="cart-title">{{ it.title }}</span>
+      {% endif %}
+      <div class="muted">{{ it.author or 'No longer in the store' }}</div>
+      {% if it.mode == 'buy' %}
+        <span class="chip chip-ok">Owned</span>
+      {% elif it.active %}
+        <span class="chip chip-ok">Rented until {{ it.expires_at|nice_date }}</span>
+      {% else %}
+        <span class="chip chip-off">Rental ended {{ it.expires_at|nice_date }}</span>
+      {% endif %}
+    </div>
+    <div class="cart-price">{{ it.price|money }}</div>
+    <div>
+      {% if it.can_download %}
+        <a class="btn btn-primary btn-small" href="{{ url_for('download', book_id=it.book_id) }}">Download PDF</a>
+      {% elif it.active and it.book_id %}
+        <span class="muted small">PDF not available yet</span>
+      {% elif it.book_id %}
+        <a class="btn btn-outline btn-small" href="{{ url_for('book_detail', book_id=it.book_id) }}">Rent again</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<h2 class="section-title">Order history</h2>
+<div class="cart-list">
+  {% for o in orders %}
+  <div class="order-row">
+    <div><strong>Order #{{ o.id }}</strong> <span class="muted">· {{ o.created_at|nice_date }}</span></div>
+    <div class="muted">{{ o.n }} {{ 'item' if o.n == 1 else 'items' }}</div>
+    <div class="cart-price">{{ o.total|money }}</div>
+    <a class="btn btn-ghost btn-small" href="{{ url_for('receipt', order_id=o.id) }}">Receipt</a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty">You have no books yet. <a href="{{ url_for('home') }}">Browse books</a></div>
+{% endif %}
+{% endblock %}

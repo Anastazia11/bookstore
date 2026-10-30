@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card %}
+{% block title %}Books · Bookstore{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>Books</h1>
+  <p class="muted">{{ books|length }} {{ 'result' if books|length == 1 else 'results' }}{% if filtered %} · <a href="{{ url_for('home') }}">clear filters</a>{% endif %}</p>
+</div>
+
+<form class="filters" method="get" action="{{ url_for('home') }}">
+  <input type="search" name="q" value="{{ filters.q }}" placeholder="Search by title or author">
+  <select class="fancy" name="genre" aria-label="Genre">
+    <option value="">All genres</option>
+    {% for g in genres %}<option value="{{ g.id }}" {{ 'selected' if filters.genre == g.id|string }}>{{ g.name }}</option>{% endfor %}
+  </select>
+  <select class="fancy" name="author" aria-label="Author">
+    <option value="">All authors</option>
+    {% for a in authors %}<option value="{{ a.id }}" {{ 'selected' if filters.author == a.id|string }}>{{ a.name }}</option>{% endfor %}
+  </select>
+  <select class="fancy" name="publisher" aria-label="Publisher">
+    <option value="">All publishers</option>
+    {% for p in publishers %}<option value="{{ p.id }}" {{ 'selected' if filters.publisher == p.id|string }}>{{ p.name }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-primary" type="submit">Search</button>
+</form>
+
+{% if books %}
+<div class="grid grid-main">
+  {% for book in books %}{{ card(book) }}{% endfor %}
+</div>
+{% else %}
+<div class="empty">No books match your search.</div>
+{% endif %}
+{% endblock %}

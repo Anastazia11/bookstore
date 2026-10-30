@@ -1,0 +1,26 @@
+{# Small reusable pieces: book cover, book card, star row. #}
+
+{% macro cover(book) %}
+  {% if book.image_url and asset_exists(book.image_url) %}
+    <img class="cover" src="{{ url_for('static', filename=book.image_url) }}"
+         alt="Cover of {{ book.title }}" loading="lazy">
+  {% else %}
+    {# No image file yet: show a coloured tile with the title instead. #}
+    <div class="cover cover-ph ph{{ (book.id or 0) % 5 }}"><span>{{ book.title }}</span></div>
+  {% endif %}
+{% endmacro %}
+
+{% macro card(book, current_id=None) %}
+  <a class="card" href="{{ url_for('book_detail', book_id=book.id) }}">
+    {{ cover(book) }}
+    <div class="card-title">{{ book.title }}</div>
+    <div class="card-sub">{{ book.author }}</div>
+  </a>
+{% endmacro %}
+
+{% macro stars(value) %}
+  {% set filled = (value or 0)|round|int %}
+  <span class="stars" aria-label="{{ value or 0 }} out of 5">
+    {% for i in range(1, 6) %}<span class="{{ 'on' if i <= filled else '' }}">★</span>{% endfor %}
+  </span>
+{% endmacro %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cover %}
+{% block title %}Order #{{ order.id }} · Bookstore{% endblock %}
+
+{% block content %}
+<div class="receipt-head">
+  <div class="success-mark" aria-hidden="true">✓</div>
+  <h1>Payment successful</h1>
+  <p class="muted">Demo order #{{ order.id }} · {{ order.created_at|nice_date }} · {{ order.total|money }}</p>
+</div>
+
+<div class="cart-list">
+  {% for it in lines %}
+  <div class="cart-row">
+    <div class="cart-cover">{{ cover({'id': it.book_id, 'title': it.title, 'image_url': it.image_url}) }}</div>
+    <div class="cart-info">
+      <div class="cart-title">{{ it.title }}</div>
+      <div class="muted">{{ it.author or '' }}</div>
+      <span class="chip">{% if it.mode == 'buy' %}Owned{% else %}Rented until {{ it.expires_at|nice_date }}{% endif %}</span>
+    </div>
+    <div class="cart-price">{{ it.price|money }}</div>
+    <div>
+      {% if it.can_download %}
+        <a class="btn btn-primary btn-small" href="{{ url_for('download', book_id=it.book_id) }}">Download PDF</a>
+      {% else %}
+        <span class="muted small">PDF not available yet</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+  <div class="cart-total"><span>Total paid</span><strong>{{ order.total|money }}</strong></div>
+  <div class="cart-actions">
+    <a class="btn btn-outline" href="{{ url_for('home') }}">Keep browsing</a>
+    <a class="btn btn-primary" href="{{ url_for('library') }}">Go to my library</a>
+  </div>
+</div>
+{% endblock %}

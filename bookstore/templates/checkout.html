@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cover %}
+{% block title %}Checkout · Bookstore{% endblock %}
+
+{% block content %}
+<div class="page-head"><h1>Checkout</h1></div>
+
+<div class="demo-banner">
+  <strong>Demo payment.</strong> This is a practice store: no real money is charged, and no card
+  details are collected or stored. Just press “Pay”.
+</div>
+
+<div class="checkout">
+  <section class="text-card">
+    <h2>Order summary</h2>
+    {% for it in items %}
+    <div class="sum-row">
+      <div class="sum-cover">{{ cover({'id': it.book_id, 'title': it.title, 'image_url': it.image_url}) }}</div>
+      <div class="sum-info">
+        <div class="sum-title">{{ it.title }}</div>
+        <div class="muted">{{ it.author }}</div>
+        <span class="chip">{{ 'Buy' if it.mode == 'buy' else 'Rent' }}</span>
+      </div>
+      <div class="cart-price">
+        {% if it.mode == 'buy' %}{{ it.price|money }}{% else %}{{ it|rent_label }}{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+    <div class="cart-total"><span>Total</span><strong>{{ total|money }}</strong></div>
+  </section>
+
+  <section class="text-card pay-card">
+    <h2>Payment</h2>
+    <form method="post" action="{{ url_for('pay') }}" data-busy="Processing payment…">
+      <label>Name on card
+        <input value="Demo Customer" readonly tabindex="-1">
+      </label>
+      <label>Card number
+        <input value="4242 4242 4242 4242" readonly tabindex="-1">
+      </label>
+      <div class="pay-row">
+        <label>Expiry <input value="12 / 30" readonly tabindex="-1"></label>
+        <label>CVC <input value="123" readonly tabindex="-1"></label>
+      </div>
+      <p class="muted small">Test card, filled in for you.</p>
+      <button class="btn btn-primary btn-block" type="submit">Pay {{ total|money }}</button>
+      <a class="btn btn-ghost btn-block" href="{{ url_for('cart') }}">Back to cart</a>
+    </form>
+  </section>
+</div>
+{% endblock %}

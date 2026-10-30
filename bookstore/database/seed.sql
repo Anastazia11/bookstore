@@ -1,0 +1,72 @@
+USE bookstore;
+
+INSERT INTO genres (name) VALUES
+  ('Sci-fi'),
+  ('Academic'),
+  ('Self-Help'),
+  ('Wellness');
+
+INSERT INTO publishers (name) VALUES
+  ('DOUBLEDAY'),
+  ('Pearson Education Inc'),
+  ('Cambridge University Press'),
+  ('Harper Collins Publishers'),
+  ('Plata Publishing LLC'),
+  ('PENGUIN BOOKS'),
+  ('McGraw-Hill Education'),
+  ('Brooks/Cole Cengage Learning'),
+  ('Piatkus');
+
+INSERT INTO authors (name) VALUES
+  ('Michio Kaku'),
+  ('DeGroot & Schervish'),
+  ('Cambridge University Press'),
+  ('Yuval Noah Harari'),
+  ('Robert T. Kiyosaki'),
+  ('Robert Greene'),
+  ('Charlotte Cho'),
+  ('Kenneth H. Rosen'),
+  ('James Stewart'),
+  ('George Berkowski');
+
+INSERT INTO books (title, image_url, pdf_path, isbn, publication_year, price, rent_price, rent_period, genre_id, author_id, publisher_id) VALUES
+  ('PHYSICS OF THE IMPOSSIBLE', 'covers/physics-of-the-impossible.jpg', 'pdfs/physics-of-the-impossible.pdf', '9780385520690', 2008, 26.95, NULL, NULL,
+   (SELECT id FROM genres WHERE name='Sci-fi'),
+   (SELECT id FROM authors WHERE name='Michio Kaku'),
+   (SELECT id FROM publishers WHERE name='DOUBLEDAY')),
+  ('Probability and Statistics 4th Edition', 'covers/probability-and-statistics.jpg', 'pdfs/probability-and-statistics.pdf', '9780321500465', 2012, 94.44, 10.83, 'month',
+   (SELECT id FROM genres WHERE name='Academic'),
+   (SELECT id FROM authors WHERE name='DeGroot & Schervish'),
+   (SELECT id FROM publishers WHERE name='Pearson Education Inc')),
+  ('IELTS 13 ACADEMIC WITH ANSWERS', 'covers/ielts-13-academic.jpg', 'pdfs/ielts-13-academic.pdf', '9781108619417', 2015, 66.22, 7.32, 'month',
+   (SELECT id FROM genres WHERE name='Academic'),
+   (SELECT id FROM authors WHERE name='Cambridge University Press'),
+   (SELECT id FROM publishers WHERE name='Cambridge University Press')),
+  ('Homo Deus: A Brief History of Tomorrow', 'covers/homo-deus.jpg', 'pdfs/homo-deus.pdf', '9780062663177', 2017, 20.11, 24.38, 'semester',
+   (SELECT id FROM genres WHERE name='Academic'),
+   (SELECT id FROM authors WHERE name='Yuval Noah Harari'),
+   (SELECT id FROM publishers WHERE name='Harper Collins Publishers')),
+  ('RICH DAD POOR DAD', 'covers/rich-dad-poor-dad.jpg', 'pdfs/rich-dad-poor-dad.pdf', '9781612680002', 2011, 11.99, 7.19, 'month',
+   (SELECT id FROM genres WHERE name='Self-Help'),
+   (SELECT id FROM authors WHERE name='Robert T. Kiyosaki'),
+   (SELECT id FROM publishers WHERE name='Plata Publishing LLC')),
+  ('THE 48 LAWS OF POWER', 'covers/the-48-laws-of-power.jpg', 'pdfs/the-48-laws-of-power.pdf', '9781101042458', 1998, 26.00, 9.21, 'month',
+   (SELECT id FROM genres WHERE name='Self-Help'),
+   (SELECT id FROM authors WHERE name='Robert Greene'),
+   (SELECT id FROM publishers WHERE name='PENGUIN BOOKS')),
+  ('The Little Book of Skincare', 'covers/little-book-of-skincare.jpg', 'pdfs/little-book-of-skincare.pdf', '9780062416384', 2015, 19.99, 19.76, 'month',
+   (SELECT id FROM genres WHERE name='Wellness'),
+   (SELECT id FROM authors WHERE name='Charlotte Cho'),
+   (SELECT id FROM publishers WHERE name='Harper Collins Publishers')),
+  ('Discrete Mathematics and Its Application 8th Edition', 'covers/discrete-mathematics.jpg', 'pdfs/discrete-mathematics.pdf', '9781259676512', 2019, 70.99, 65.00, 'semester',
+   (SELECT id FROM genres WHERE name='Academic'),
+   (SELECT id FROM authors WHERE name='Kenneth H. Rosen'),
+   (SELECT id FROM publishers WHERE name='McGraw-Hill Education')),
+  ('Multivariables Calculus 7th Edition', 'covers/multivariable-calculus.jpg', 'pdfs/multivariable-calculus.pdf', '9780538497879', 2012, 251.95, 76.99, 'semester',
+   (SELECT id FROM genres WHERE name='Academic'),
+   (SELECT id FROM authors WHERE name='James Stewart'),
+   (SELECT id FROM publishers WHERE name='Brooks/Cole Cengage Learning')),
+  ('How to Build A Billion Dollar App', 'covers/billion-dollar-app.jpg', 'pdfs/billion-dollar-app.pdf', '9780349401386', 2014, 30.99, 11.99, 'month',
+   (SELECT id FROM genres WHERE name='Self-Help'),
+   (SELECT id FROM authors WHERE name='George Berkowski'),
+   (SELECT id FROM publishers WHERE name='Piatkus'));

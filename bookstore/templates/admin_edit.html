@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ book.title }} · Bookstore{% endblock %}
+{% block main_class %}page page-wide{% endblock %}
+
+{% block content %}
+<p class="crumbs"><a href="{{ url_for('admin') }}">← Manage books</a></p>
+<div class="page-head"><h1>Edit book</h1>
+  <p class="muted">Choose a new cover or PDF only if you want to replace the current one.</p>
+</div>
+
+<section class="text-card">
+  <form class="admin-form" method="post" action="{{ url_for('admin_edit', book_id=book.id) }}" enctype="multipart/form-data" data-busy="Saving…">
+    {% with b = book %}{% include "_book_form.html" %}{% endwith %}
+    <div class="span3 form-actions">
+      <button class="btn btn-primary" type="submit">Save changes</button>
+      <a class="btn btn-ghost" href="{{ url_for('admin') }}">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

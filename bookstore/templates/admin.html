@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Manage books · Bookstore{% endblock %}
+{% block main_class %}page page-wide{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <h1>Manage books</h1>
+  <p class="muted">Add a book (with its cover and PDF), edit it, change a price, or delete it. Everything happens here, no files to copy by hand.</p>
+</div>
+
+{# ---------- UPDATE 1: add a book ---------- #}
+<section class="text-card">
+  <h2>Add a new book</h2>
+  <form class="admin-form" method="post" action="{{ url_for('admin_add') }}" enctype="multipart/form-data" data-busy="Uploading…">
+    {% with b = {} %}{% include "_book_form.html" %}{% endwith %}
+    <div class="span3"><button class="btn btn-primary" type="submit">Add book</button></div>
+  </form>
+</section>
+
+{# ---------- UPDATE 2 and 3: change price / delete (and edit) ---------- #}
+<section class="text-card">
+  <h2>All books ({{ books|length }})</h2>
+  <div class="table-wrap">
+  <table class="admin-table">
+    <thead><tr><th>Title</th><th>Author</th><th>Files</th><th>Buy price</th><th>Rent price</th><th>Period</th><th></th></tr></thead>
+    <tbody>
+    {% for b in books %}
+      <tr>
+        <td class="t-title"><a href="{{ url_for('book_detail', book_id=b.id) }}">{{ b.title }}</a></td>
+        <td>{{ b.author }}</td>
+        <td class="t-files">
+          <span class="chip {{ 'chip-ok' if asset_exists(b.image_url) else 'chip-off' }}">Cover</span>
+          <span class="chip {{ 'chip-ok' if pdf_exists(b.pdf_path) else 'chip-off' }}">PDF</span>
+        </td>
+        <td><input form="pf{{ b.id }}" name="price" inputmode="decimal" value="{{ '%.2f'|format(b.price) if b.price is not none else '' }}" aria-label="Buy price"></td>
+        <td><input form="pf{{ b.id }}" name="rent_price" inputmode="decimal" value="{{ '%.2f'|format(b.rent_price) if b.rent_price is not none else '' }}" aria-label="Rent price"></td>
+        <td>
+          <select class="fancy" form="pf{{ b.id }}" name="rent_period" aria-label="Rent period">
+            <option value="month" {{ 'selected' if b.rent_period != 'semester' }}>month</option>
+            <option value="semester" {{ 'selected' if b.rent_period == 'semester' }}>semester</option>
+          </select>
+        </td>
+        <td class="t-actions">
+          <form id="pf{{ b.id }}" method="post" action="{{ url_for('admin_price', book_id=b.id) }}"></form>
+          <button class="btn btn-small btn-primary" form="pf{{ b.id }}" type="submit">Save price</button>
+          <a class="btn btn-small btn-outline" href="{{ url_for('admin_edit', book_id=b.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('admin_delete', book_id=b.id) }}"
+                onsubmit="return confirm('Delete this book? This cannot be undone.');">
+            <button class="btn btn-small btn-danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endblock %}

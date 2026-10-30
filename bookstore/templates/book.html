@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card, cover, stars %}
+{% block title %}{{ book.title }} · Bookstore{% endblock %}
+{% block main_class %}page page-wide{% endblock %}
+
+{% block content %}
+<p class="crumbs"><a href="{{ url_for('home') }}">← All books</a></p>
+
+<div class="split">
+
+  {# ================= LEFT PANEL: this book ================= #}
+  <article class="panel detail">
+    <div class="detail-top">
+      <div class="detail-cover">{{ cover(book) }}</div>
+
+      <div class="detail-info">
+        <h1>{{ book.title }}</h1>
+        <p class="by">by {{ book.author }}</p>
+
+        <div class="rating-row">
+          {{ stars(book.avg_rating) }}
+          {% if book.rating_count %}
+            <strong>{{ book.avg_rating }}</strong>
+            <span class="muted">({{ book.rating_count }} {{ 'rating' if book.rating_count == 1 else 'ratings' }})</span>
+          {% else %}
+            <span class="muted">No ratings yet</span>
+          {% endif %}
+        </div>
+
+        <dl class="facts">
+          <dt>Genre</dt><dd><span class="chip">{{ book.genre }}</span></dd>
+          <dt>Publisher</dt><dd>{{ book.publisher }}</dd>
+          <dt>Author</dt><dd>{{ book.author }}</dd>
+          <dt>ISBN</dt><dd>{{ book.isbn or '—' }}</dd>
+          <dt>Year</dt><dd>{{ book.publication_year or '—' }}</dd>
+        </dl>
+
+        <div class="feedback">
+          <form method="post" action="{{ url_for('feedback', book_id=book.id) }}">
+            <input type="hidden" name="vote" value="like">
+            <button type="submit" class="vote {{ 'active' if my_vote == 'like' }}" aria-label="Like" aria-pressed="{{ 'true' if my_vote == 'like' else 'false' }}">
+              <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M1 21h4V9H1v12zm22-11a2 2 0 0 0-2-2h-6.3l1-4.6v-.3c0-.4-.2-.8-.4-1.1L14 1 7.6 7.4C7.2 7.8 7 8.3 7 9v10a2 2 0 0 0 2 2h9c.8 0 1.5-.5 1.8-1.2l3-7c.1-.3.2-.5.2-.8v-2z"/></svg>
+              {{ book.likes }}
+            </button>
+          </form>
+          <form method="post" action="{{ url_for('feedback', book_id=book.id) }}">
+            <input type="hidden" name="vote" value="dislike">
+            <button type="submit" class="vote {{ 'active' if my_vote == 'dislike' }}" aria-label="Dislike" aria-pressed="{{ 'true' if my_vote == 'dislike' else 'false' }}">
+              <svg viewBox="0 0 24 24" width="20" height="20" style="transform: rotate(180deg)"><path fill="currentColor" d="M1 21h4V9H1v12zm22-11a2 2 0 0 0-2-2h-6.3l1-4.6v-.3c0-.4-.2-.8-.4-1.1L14 1 7.6 7.4C7.2 7.8 7 8.3 7 9v10a2 2 0 0 0 2 2h9c.8 0 1.5-.5 1.8-1.2l3-7c.1-.3.2-.5.2-.8v-2z"/></svg>
+              {{ book.dislikes }}
+            </button>
+          </form>
+
+          <form class="rate-form" method="post" action="{{ url_for('rate_book', book_id=book.id) }}">
+            <span class="muted">Your rating</span>
+            {% for i in range(1, 6) %}
+              <button type="submit" name="stars" value="{{ i }}" class="star-btn {{ 'on' if i <= my_stars }}" aria-label="Rate {{ i }} out of 5">★</button>
+            {% endfor %}
+          </form>
+        </div>
+      </div>
+    </div>
+
+    {% if book.description %}<p class="description">{{ book.description }}</p>{% endif %}
+
+    {% if access %}
+    <div class="owned-box">
+      <div>
+        <strong>{% if access.mode == 'buy' %}✓ You own this book{% else %}✓ You are renting this book until {{ access.expires_at|nice_date }}{% endif %}</strong>
+        {% if not has_pdf %}<div class="muted">The PDF has not been uploaded yet.</div>{% endif %}
+      </div>
+      {% if has_pdf %}<a class="btn btn-primary" href="{{ url_for('download', book_id=book.id) }}">Download PDF</a>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if not (access and access.mode == 'buy') %}
+    <div class="buy-box">
+      <form method="post" action="{{ url_for('cart_add') }}">
+        <input type="hidden" name="book_id" value="{{ book.id }}">
+        <input type="hidden" name="mode" value="buy">
+        <button class="btn btn-primary" type="submit" {{ 'disabled' if book.price is none }}>
+          Buy {% if book.price is not none %}· {{ book.price|money }}{% endif %}
+        </button>
+      </form>
+      <form method="post" action="{{ url_for('cart_add') }}">
+        <input type="hidden" name="book_id" value="{{ book.id }}">
+        <input type="hidden" name="mode" value="rent">
+        <button class="btn btn-outline" type="submit" {{ 'disabled' if book.rent_price is none }}>
+          {% if book.rent_price is none %}Rent not available{% else %}Rent · {{ book|rent_label }}{% endif %}
+        </button>
+      </form>
+      {% if in_cart %}<a class="in-cart" href="{{ url_for('cart') }}">✓ In your cart ({{ in_cart.mode }})</a>{% endif %}
+    </div>
+    {% endif %}
+
+    <section class="same-genre">
+      <h2>More in {{ book.genre }}</h2>
+      {% if same_genre %}
+      <div class="grid grid-small">
+        {% for b in same_genre %}{{ card(b) }}{% endfor %}
+      </div>
+      {% else %}
+      <p class="muted">No other books in this genre yet.</p>
+      {% endif %}
+    </section>
+  </article>
+
+  {# ================= RIGHT PANEL: other books ================= #}
+  <aside class="panel others">
+    <h2>Other books</h2>
+    <div class="grid grid-small">
+      {% for b in others %}{{ card(b) }}{% endfor %}
+    </div>
+  </aside>
+
+</div>
+{% endblock %}

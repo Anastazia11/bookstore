@@ -1,0 +1,29 @@
+{# The book fields, shared by "Add a new book" and "Edit book".
+   Needs: b (the book, or {} for a new one), authors, genres, publishers. #}
+{% set v = b or {} %}
+<label class="span2">Title <input name="title" required maxlength="200" value="{{ v.title or '' }}"></label>
+<label>Author <input name="author" required maxlength="100" value="{{ v.author or '' }}"
+       data-suggest='{{ authors|map(attribute="name")|list|tojson }}'></label>
+<label>Genre <input name="genre" required maxlength="50" value="{{ v.genre or '' }}"
+       data-suggest='{{ genres|map(attribute="name")|list|tojson }}'></label>
+<label>Publisher <input name="publisher" required maxlength="100" value="{{ v.publisher or '' }}"
+       data-suggest='{{ publishers|map(attribute="name")|list|tojson }}'></label>
+<label>ISBN <input name="isbn" maxlength="24" placeholder="9781234567897" value="{{ v.isbn or '' }}"></label>
+<label>Year <input name="year" type="number" min="1000" max="2100" value="{{ v.publication_year or '' }}"></label>
+<label>Buy price <input name="price" inputmode="decimal" required placeholder="19.99"
+       value="{{ '%.2f'|format(v.price) if v.price is defined and v.price is not none else '' }}"></label>
+<label>Rent price <input name="rent_price" inputmode="decimal" placeholder="optional"
+       value="{{ '%.2f'|format(v.rent_price) if v.rent_price is defined and v.rent_price is not none else '' }}"></label>
+<label>Rent period
+  <select class="fancy" name="rent_period" aria-label="Rent period">
+    <option value="month" {{ 'selected' if v.rent_period != 'semester' }}>per month</option>
+    <option value="semester" {{ 'selected' if v.rent_period == 'semester' }}>per semester</option>
+  </select>
+</label>
+<label>Cover image <span class="hint">JPG, PNG or WEBP{% if v.image_url %} · {{ 'current file found' if asset_exists(v.image_url) else 'current file missing' }}{% endif %}</span>
+  <input class="file" type="file" name="cover_file" accept="image/jpeg,image/png,image/webp">
+</label>
+<label class="span2">Book PDF <span class="hint">sent only to people who buy or rent it{% if v.pdf_path %} · {{ 'current file found' if pdf_exists(v.pdf_path) else 'current file missing' }}{% endif %}</span>
+  <input class="file" type="file" name="pdf_file" accept="application/pdf,.pdf">
+</label>
+<label class="span3">Description <input name="description" value="{{ v.description or '' }}"></label>
