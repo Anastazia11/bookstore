@@ -12,7 +12,7 @@ import os
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = int(os.environ.get("DB_PORT", "3306"))
 DB_USER = os.environ.get("DB_USER", "root")
-DB_PASSWORD = os.environ.get("DB_PASSWORD", "!2E4Gb")   # <-- change this
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "")   # <-- change this
 DB_NAME = os.environ.get("DB_NAME", "bookstore")
 DB_SSL_CA = os.environ.get("DB_SSL_CA")  # only needed for some cloud databases
 
